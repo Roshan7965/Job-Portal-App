@@ -27,6 +27,7 @@ app.post('/webhook',clerkWebhooks)
 //port 
 const PORT=process.env.PORT || 5000;
 Sentry.setupExpressErrorHandler(app);
-app.listen(PORT,()=>{
+
+export default app.listen(PORT,()=>{
     console.log("server is running on " +`${PORT}`)
 })
