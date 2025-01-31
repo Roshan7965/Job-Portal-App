@@ -1,6 +1,3 @@
-import mongoose from "mongoose";
-
-// Function to connect to the MongoDB database
 const connectDB = async () => {
     try {
         mongoose.connection.on('connected', () => {
@@ -11,15 +8,20 @@ const connectDB = async () => {
             console.error(`Database connection error: ${err.message}`);
         });
 
-        await mongoose.connect(`${process.env.MONGODB_URL}/job-portal`, {
+        // Check if the connection string is correct
+        console.log("MongoDB URL:", process.env.MONGODB_URL);
+
+        await mongoose.connect(process.env.MONGODB_URL, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
+            useCreateIndex: true,  // Optional if you're using a version of Mongoose that supports it
         });
 
     } catch (error) {
         console.error("Error connecting to the database:", error.message);
         process.exit(1); // Exit the process if the connection fails
     }
-}
+};
 
 export default connectDB;
+
