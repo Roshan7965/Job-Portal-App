@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 const connectDB = async () => {
     try {
         mongoose.connection.on('connected', () => {
@@ -11,11 +13,8 @@ const connectDB = async () => {
         // Check if the connection string is correct
         console.log("MongoDB URL:", process.env.MONGODB_URL);
 
-        await mongoose.connect(process.env.MONGODB_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useCreateIndex: true,  // Optional if you're using a version of Mongoose that supports it
-        });
+        // Removed deprecated options
+        await mongoose.connect(process.env.MONGODB_URL);
 
     } catch (error) {
         console.error("Error connecting to the database:", error.message);
@@ -24,4 +23,3 @@ const connectDB = async () => {
 };
 
 export default connectDB;
-
