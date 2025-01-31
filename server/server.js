@@ -9,7 +9,7 @@ import { clerkWebhooks } from './controllers/webhooks.js';
 const app =express();
 
 //connect to database
-await connectDB()
+await connectDB();
 
 //Middlewares
 app.use(cors())
@@ -28,6 +28,6 @@ app.post('/webhook',clerkWebhooks)
 const PORT=process.env.PORT || 5000;
 Sentry.setupExpressErrorHandler(app);
 
-export default app.listen(PORT,()=>{
+app.listen(PORT,()=>{
     console.log("server is running on " +`${PORT}`)
 })
