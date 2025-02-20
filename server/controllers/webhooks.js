@@ -5,10 +5,10 @@ import "dotenv/config"
 export const clerkWebhooks = async (req, res) => {
     try {
         // Create a Svix webhook instance using the Clerk Webhook secret
-        const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
-
+        const wHook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
+        console.log("first")
         // Verify webhook headers
-        whook.verify(
+        await wHook.verify(
             JSON.stringify(req.body),
             {
                 "svix-id": req.headers["svix-id"],
@@ -32,6 +32,7 @@ export const clerkWebhooks = async (req, res) => {
                 };
 
                 await User.create(userData);
+                
                 res.json({ success: true });
                 break;
             }
