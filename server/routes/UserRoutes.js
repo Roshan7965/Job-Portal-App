@@ -15,7 +15,7 @@ router.post('/apply',applyForJob);
 router.get('/applications',getUserJobApplication);
 
 //Update user profile (resume)
-router.post('/update-resume',upload.single('resume'),updateUserResume);
+router.put('/update-resume',upload.single('resume'),updateUserResume);
 
 
 export default router;

@@ -7,8 +7,9 @@ import { AppContext } from "../context/AppContext";
 const Navbar = () => {
   const { openSignIn } = useClerk();
   const { user } = useUser();
+  //console.log(user);
   const navigate = useNavigate();
-  const { showRecruiterLogin, setRecruiterLogin } = useContext(AppContext);
+  const { showRecruiterLogin, setShowRecruiterLogin } = useContext(AppContext);
 
   return (
     <div className=" shadow-lg py-4  flex flex-wrap  ">
@@ -24,14 +25,14 @@ const Navbar = () => {
             <Link to={"/applications"}>Applied Jobs</Link>
             <p className="max-sm:hidden">|</p>
             <p className="max-sm:hidden">
-              Hi, {user.firstName + " " + user.lastName}
+              Hi, {user.firstName}
             </p>
             <UserButton />
           </div>
         ) : (
           <div className="flex gap-4 max-sm:text-xs">
             <button
-              onClick={() => setRecruiterLogin(true)}
+              onClick={() => setShowRecruiterLogin(true)}
               className="text-gray-600"
             >
               Recruiter Login

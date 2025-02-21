@@ -1,9 +1,15 @@
 import React, { startTransition, useContext, useEffect, useState } from "react";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
+import axios from "axios";
+import { Form, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const RecruiterLogin = () => {
-  const { showRecruiterLogin, setRecruiterLogin } = useContext(AppContext);
+   
+  const navigate=useNavigate();
+
+  const { showRecruiterLogin, setShowRecruiterLogin ,backendUrl ,setCompanyData ,setCompanyToken} = useContext(AppContext);
   const [state, setState] = useState("Login");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -16,7 +22,48 @@ const RecruiterLogin = () => {
     e.preventDefault();
 
     if (state === "Sign Up" && !isTextDataSubmitted) {
-      setIsTextDataSubmitted(true);
+      return setIsTextDataSubmitted(true);
+    }
+
+    try {
+      if( state==="Login"){
+        
+        const {data}=await axios.post(backendUrl+'/api/company/login',{email,password});
+        
+        if(data.success){
+          setCompanyToken(data.token);
+          setCompanyData(data.company);
+          localStorage.setItem('companyToken',data.token);
+          setShowRecruiterLogin(false);
+          navigate('/dashboard');
+          toast.success(data.message);
+        }else{
+          toast.error(data.message);
+        }
+        
+
+      }else{
+        
+        const formData=new FormData();
+        formData.append('name',name);
+        formData.append('email',email);
+        formData.append('password',password);
+        formData.append('image',image);
+        const {data}=await axios.post(backendUrl+'/api/company/register',formData);
+        if(data.success){
+          setCompanyToken(data.token);
+          setCompanyData(data.company);
+          localStorage.setItem('companyToken',data.token);
+          setShowRecruiterLogin(false);
+          navigate('/dashboard/manage-job');
+          toast.success(data.message);
+        }else{
+          toast.error(data.message);
+        }
+
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
   };
 
@@ -44,7 +91,7 @@ const RecruiterLogin = () => {
         </div> */}
 
         <img
-          onClick={() => setRecruiterLogin(false)}
+          onClick={() => setShowRecruiterLogin(false)}
           className="absolute  top-5 right-5 cursor-pointer"
           src={assets.cross_icon}
           alt=""

@@ -4,12 +4,56 @@ import { assets, jobsApplied } from "../assets/assets";
 import moment from "moment/moment";
 import Filter from "../components/Filter";
 import Navbar from "../components/Navbar";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { useAuth } from "@clerk/clerk-react";
+
 const Applications = () => {
-  const { jobApplications } = useContext(AppContext);
+  const { userApplication ,backendUrl ,fetchUserData } = useContext(AppContext);
+
+ 
+
+  const { getToken } = useAuth()
 
   const [isEdit, setIsEdit] = useState(true);
   const [resume, setResume] = useState(null);
-
+  
+  //function to update resume of user
+  const saveHandler = async () => {
+    try {
+      const token = await getToken();
+  
+      if (!resume) {
+        toast.error("Please select a resume");
+        return;
+      }
+  
+      // Create FormData and append the file
+      const formData = new FormData();
+      formData.append("resume", resume); // 'resume' should match the backend field name
+  
+      const { data } = await axios.put(
+        `${backendUrl}/api/user/update-resume`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+  
+      if (data.success) {
+        toast.success(data.message);
+        fetchUserData();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+  
   return (
     <div className="">
       <Navbar/>
@@ -31,7 +75,7 @@ const Applications = () => {
               <img src={assets.profile_upload_icon} alt="" />
             </label>
             <button
-              onClick={() => setIsEdit(false)}
+              onClick={saveHandler}
               className="bg-blue-100 text-blue-400 px-3 py-1.5 rounded-sm cursor-pointer"
             >
               Save
@@ -53,7 +97,9 @@ const Applications = () => {
       </div>
       <div  className="mx-4 sm:mx-[5%]">
         <h2 className="font-semibold text-xl mb-4">Jobs Applied</h2>
-        <table className="min-w-full bg-white border rounded-lg mb-20">
+        {
+          userApplication?.length>0 ?(
+            <table className="min-w-full bg-white border rounded-lg mb-20">
           <thead>
             <tr>
               <th className="py-3 px-4 border-b text-left">Company</th>
@@ -68,18 +114,18 @@ const Applications = () => {
             </tr>
           </thead>
           <tbody>
-            {jobsApplied.map((job, index) =>
+            {userApplication?.map((job, index) =>
               true ? (
                 <tr key={index}>
                   <td className="  py-3 px-4 border-b text-left">
                     <div className="flex gap-3">
-                      <img src={job.logo} alt="" />
-                      {job.company}
+                      <img className="w-10" src={job.companyId.image} alt="" />
+                      {job.companyId.name.toUpperCase()}
                     </div>
                   </td>
-                  <td className="py-3 px-4 border-b text-left">{job.title}</td>
+                  <td className="py-3 px-4 border-b text-left">{job.jobId.title}</td>
                   <td className="py-3 px-4 border-b text-left max-sm:hidden ">
-                    {job.location}
+                    {job.jobId.location}
                   </td>
                   <td className="py-3 px-4 border-b text-left max-sm:hidden">
                     {moment(job.date).format("ll")}
@@ -102,6 +148,12 @@ const Applications = () => {
             )}
           </tbody>
         </table>
+
+          ):(
+            <h1 className="pt-20 font-bold pb-48 text-center">Not Applied yet</h1>
+          )
+        }
+        
         <Filter/>
       </div>
       

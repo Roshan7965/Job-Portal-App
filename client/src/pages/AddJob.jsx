@@ -3,17 +3,19 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css"; // Import Quill CSS for proper styling
 import { JobLocations } from "../assets/assets";
 import { JobCategories } from "../assets/assets";
+import axios from "axios";
+import { AppContext } from "../context/AppContext";
+import { toast } from "react-toastify";
 
 const AddJob = () => {
-  const JobLevel=["Beginner Level","immediate Level ","Senior Level"];
+  const { backendUrl, companyToken } = useContext(AppContext);
+  const JobLevel = ["Beginner Level", "immediate Level ", "Senior Level"];
   const [title, setTitle] = useState("");
-  const [location, setLocation] = useState("");
-  const [category, setCategory] = useState("");
-  const [level, setLevel] = useState("");
+  const [location, setLocation] = useState("Bangalore");
+  const [category, setCategory] = useState("Programming");
+  const [level, setLevel] = useState("Beginner Level");
   const [salary, setSalary] = useState();
   const [description, setDescription] = useState("");
-
-
 
   const editorRef = useRef(null);
   const quillRef = useRef(null);
@@ -30,7 +32,6 @@ const AddJob = () => {
             ["clean"], // Remove formatting
           ],
         },
-        
       });
       quillRef.current.on("text-change", () => {
         setDescription(quillRef.current.root.innerHTML);
@@ -38,25 +39,54 @@ const AddJob = () => {
     }
   }, []);
 
-  const handleSubmit = (e) => {
-    if (!description || quillRef.current.getLength() <= 1) {
-      alert("Job Description is required.");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if( quillRef.current.getLength() <= 1){
+      toast.error("description is required");
       return;
     }
-    e.preventDefault();
-    console.log({
-      title,
-      location,
-      category,
-      level,
-      salary,
-      description,
-    });
-    alert("Job posted successfully!");
+    
+    try {
+      const response = await axios.post(
+        backendUrl + "/api/company/post-job",
+        {
+          title,
+          location,
+          category,
+          level,
+          salary,
+          description,
+        },
+        { headers: { token: companyToken } }
+      );
+  
+     
+  
+      const { data } = response;
+  
+      if (data.success) {
+        toast.success(data.message || "Job posted successfully!"); // Ensure a message is passed
+        setTitle("");
+        setSalary("");
+        quillRef.current.root.innerHTML = "";
+        setDescription("");
+      } else {
+        toast.error(data.message || "Something went wrong.");
+      }
+    } catch (error) {
+      console.error("Error posting job:", error);
+      const errorMessage =
+        error.response?.data?.message || error.message || "An error occurred.";
+      toast.error(errorMessage);
+    }
   };
+  
 
   return (
-    <form onSubmit={handleSubmit} className="mx-4 my-4 sm:ml-10 sm:my-10 flex flex-col gap-5">
+    <form
+      onSubmit={handleSubmit}
+      className="mx-4 my-4 sm:ml-10 sm:my-10 flex flex-col gap-5"
+    >
       <div>
         <label>
           <p className="mb-2">Job Title</p>
@@ -81,7 +111,7 @@ const AddJob = () => {
 
             <select
               onChange={(e) => setLocation(e.target.value)}
-              placeholder ="select the Location"
+              placeholder="select the Location"
               value={location}
               className="border p-2 w-full"
               required

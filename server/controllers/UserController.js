@@ -14,30 +14,29 @@ export const getUserData=async(req,res)=>{
         const user=await User.findById(userId);
 
         if(!user){
-            return res.status(404).json({success:false,message:"user does not exit"});
+            return res.json({success:false,message:"user does not exit"});
         }
 
         res.status(200).json({success:true,user});
         
     } catch (error) {
-        res.status(500).json({success:false,message:error.message});
+        res.json({success:false,message:error.message});
     }
 
 }
 
 //Apply for Job
 export  const applyForJob=async(req,res)=>{
-
-    const jobId=req.body;
-
-    const userId=req.auth.userId;
+    const {jobId}=req.body;
+    const userId=req.auth?.userId;
 
     try {
 
         const isAlreadyApplied=await JobApplication.find({userId,jobId});
+        console.log(isAlreadyApplied);
 
-        if(isAlreadyApplied){
-            return res.status(400).json({success:false,message:"Already Applied Job"});
+        if(isAlreadyApplied.length >0){
+            return res.json({success:false,message:"Already Applied Job"});
         }
 
         const jobData=await Job.findById(jobId);
