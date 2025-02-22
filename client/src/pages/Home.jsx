@@ -1,6 +1,6 @@
 import AppDownLoad from "../components/AppDownLoad";
 import Filter from "../components/Filter";
-import Hero from "../components/hero";
+import Hero from "../components/Hero";
 import JobListing from "../components/JobListing";
 import Navbar from "../components/Navbar";
 
