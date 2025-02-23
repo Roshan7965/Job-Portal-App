@@ -11,7 +11,6 @@ import JobRoutes from './routes/JobRoutes.js';
 import UserRoutes from './routes/UserRoutes.js';
 import { clerkMiddleware } from '@clerk/express';
 import axios from "axios";
-
 //initialize express
 const app =express();
 
