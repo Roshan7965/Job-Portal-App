@@ -9,8 +9,8 @@ import companyRoutes from './routes/companyRoutes.js';
 import connectCloudinary from "./config/Cloudinary.js";
 import JobRoutes from './routes/JobRoutes.js';
 import UserRoutes from './routes/UserRoutes.js';
-import { clerkMiddleware } from '@clerk/express'
-
+import { clerkMiddleware } from '@clerk/express';
+import axios from "axios";
 
 //initialize express
 const app =express();
@@ -20,11 +20,28 @@ await connectDB();
 await connectCloudinary();
 
 
+
+
 //Middlewares
 app.use(cors());
 app.use(express.json());
 app.use(clerkMiddleware());
 
+const url = process.env.SERVER_BACKEND_URL;
+const interval = 30000;
+
+function reloadWebsite() {
+  axios
+    .get(url)
+    .then((response) => {
+      console.log("website reloded");
+    })
+    .catch((error) => {
+      console.error(`Error : ${error.message}`);
+    });
+}
+
+setInterval(reloadWebsite, interval);
 
 //Routes
 app.get('/',(req,res)=> res.send("Api Working"))
