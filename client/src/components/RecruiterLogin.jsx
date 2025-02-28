@@ -6,14 +6,22 @@ import { Form, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const RecruiterLogin = () => {
-   
-  const navigate=useNavigate();
+  const defaultEmail = import.meta.env.VITE_RECRUITER_EMAIL;
+  const defaultPassword = import.meta.env.VITE_RECRUITER_PASSWORD;
 
-  const { showRecruiterLogin, setShowRecruiterLogin ,backendUrl ,setCompanyData ,setCompanyToken} = useContext(AppContext);
+  const navigate = useNavigate();
+
+  const {
+    showRecruiterLogin,
+    setShowRecruiterLogin,
+    backendUrl,
+    setCompanyData,
+    setCompanyToken,
+  } = useContext(AppContext);
   const [state, setState] = useState("Login");
   const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState(defaultPassword);
+  const [email, setEmail] = useState(defaultEmail);
 
   const [image, setImage] = useState(false);
   const [isTextDataSubmitted, setIsTextDataSubmitted] = useState(false);
@@ -26,41 +34,42 @@ const RecruiterLogin = () => {
     }
 
     try {
-      if( state==="Login"){
-        
-        const {data}=await axios.post(backendUrl+'/api/company/login',{email,password});
-        
-        if(data.success){
+      if (state === "Login") {
+        const { data } = await axios.post(backendUrl + "/api/company/login", {
+          email,
+          password,
+        });
+
+        if (data.success) {
           setCompanyToken(data.token);
           setCompanyData(data.company);
-          localStorage.setItem('companyToken',data.token);
+          localStorage.setItem("companyToken", data.token);
           setShowRecruiterLogin(false);
-          navigate('/dashboard');
+          navigate("/dashboard/manage-jobs");
           toast.success(data.message);
-        }else{
+        } else {
           toast.error(data.message);
         }
-        
-
-      }else{
-        
-        const formData=new FormData();
-        formData.append('name',name);
-        formData.append('email',email);
-        formData.append('password',password);
-        formData.append('image',image);
-        const {data}=await axios.post(backendUrl+'/api/company/register',formData);
-        if(data.success){
+      } else {
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("email", email);
+        formData.append("password", password);
+        formData.append("image", image);
+        const { data } = await axios.post(
+          backendUrl + "/api/company/register",
+          formData
+        );
+        if (data.success) {
           setCompanyToken(data.token);
           setCompanyData(data.company);
-          localStorage.setItem('companyToken',data.token);
+          localStorage.setItem("companyToken", data.token);
           setShowRecruiterLogin(false);
-          navigate('/dashboard/manage-job');
+          navigate("/dashboard/manage-jobs");
           toast.success(data.message);
-        }else{
+        } else {
           toast.error(data.message);
         }
-
       }
     } catch (error) {
       toast.error(error.message);
@@ -145,6 +154,7 @@ const RecruiterLogin = () => {
                 className="outline-none"
                 onChange={(e) => setEmail(e.target.value)}
                 value={email}
+                name="email"
                 type="email"
                 placeholder="Email address"
                 required
@@ -156,7 +166,8 @@ const RecruiterLogin = () => {
               <input
                 className="outline-none"
                 onChange={(e) => setPassword(e.target.value)}
-                name={password}
+                value={password}
+                name="password"
                 type="password"
                 placeholder="Password"
                 required
@@ -187,7 +198,7 @@ const RecruiterLogin = () => {
               onClick={() => setState("Sign Up")}
               className="text-blue-500 font-medium cursor-pointer pl-2"
             >
-              {state}
+              Sign Up 
             </span>
           </p>
         ) : (
@@ -197,7 +208,7 @@ const RecruiterLogin = () => {
               onClick={() => setState("Login")}
               className="text-blue-500 font-medium cursor-pointer pl-2"
             >
-              {state}
+              Login 
             </span>
           </p>
         )}
